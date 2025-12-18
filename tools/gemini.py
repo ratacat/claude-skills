@@ -123,40 +123,131 @@ Chapter text:
     return json.loads(response_text)
 
 
-def synthesize_skill(book_title: str, skill_name: str, skill_description: str,
-                     chapter_extracts: list[dict], model: str = "gemini-2.5-pro-preview-05-06") -> str:
+def plan_skill(book_title: str, skill_name: str, skill_description: str,
+               chapter_extracts: list[dict], model: str = "gemini-2.5-pro-preview-05-06") -> dict:
     """
-    Take all chapter extracts and synthesize into a comprehensive SKILL.md.
-    Uses Pro model for this final synthesis step.
+    Analyze chapter extracts and create a detailed plan for the skill.
+    Returns a structured plan for what the skill should contain.
     """
     client = get_client()
 
-    prompt = f"""You are creating a Claude Code skill from extracted book knowledge.
+    prompt = f"""You are planning the structure and content of a Claude Code skill.
+
+Claude Code skills are knowledge files that Claude automatically discovers and uses based on context.
+The skill must be practical, actionable, and help Claude assist users effectively.
 
 Book: {book_title}
 Skill name: {skill_name}
 Skill description: {skill_description}
 
-Create a comprehensive SKILL.md file that will help Claude assist users with this subject matter.
-The skill should be practical, actionable, and dense with useful information.
+Review these chapter extracts and create a detailed plan for the skill:
 
-Requirements:
-1. Start with YAML frontmatter:
-   ---
-   name: {skill_name}
-   description: {skill_description}
-   ---
-
-2. Organize the content logically with clear sections
-3. Include concrete examples and code snippets where applicable
-4. Prioritize actionable guidance over theory
-5. Include common pitfalls and how to avoid them
-6. Make it scannable with good headers and bullet points
-
-Chapter extracts to synthesize:
 {json.dumps(chapter_extracts, indent=2)}
 
-Generate the complete SKILL.md content:
+Create a plan that specifies:
+
+1. sections: List of sections the skill should have, with:
+   - title: Section heading
+   - purpose: What this section accomplishes
+   - key_points: 3-5 bullet points of what to include
+   - priority: "essential", "important", or "nice-to-have"
+
+2. examples_to_include: Specific examples from the extracts that MUST be in the skill
+   - Each should have: context, code_or_content, why_important
+
+3. warnings_and_pitfalls: Critical mistakes/anti-patterns to highlight
+
+4. quick_reference: Facts, syntax, or commands that should be easily scannable
+
+5. description_keywords: Trigger words/phrases for the skill description
+   (technologies, operations, file types, problem domains users would mention)
+
+6. estimated_length: "short" (< 200 lines), "medium" (200-500), or "long" (500+)
+
+7. supporting_files: Whether to recommend additional files (reference.md, examples.md, etc.)
+
+Return ONLY valid JSON:
+{{
+  "sections": [...],
+  "examples_to_include": [...],
+  "warnings_and_pitfalls": [...],
+  "quick_reference": [...],
+  "description_keywords": [...],
+  "estimated_length": "...",
+  "supporting_files": [...]
+}}
+"""
+
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=0.2,
+        )
+    )
+
+    response_text = response.text.strip()
+    if response_text.startswith("```"):
+        lines = response_text.split("\n")
+        response_text = "\n".join(lines[1:-1])
+
+    return json.loads(response_text)
+
+
+def generate_skill(book_title: str, skill_name: str, skill_description: str,
+                   chapter_extracts: list[dict], skill_plan: dict,
+                   model: str = "gemini-2.5-pro-preview-05-06") -> str:
+    """
+    Generate the final SKILL.md based on the plan.
+    """
+    client = get_client()
+
+    prompt = f"""You are generating a Claude Code skill file (SKILL.md).
+
+## Skill Format Requirements
+
+The file MUST start with YAML frontmatter:
+```yaml
+---
+name: {skill_name}
+description: {skill_description}
+---
+```
+
+After frontmatter, include markdown content with:
+- Clear section headers (##, ###)
+- Bullet points for scannability
+- Code blocks with language tags
+- Concrete examples
+- Warnings/pitfalls clearly marked
+
+## Context
+
+Book: {book_title}
+Skill name: {skill_name}
+
+## The Plan to Follow
+
+{json.dumps(skill_plan, indent=2)}
+
+## Source Material (Chapter Extracts)
+
+{json.dumps(chapter_extracts, indent=2)}
+
+## Instructions
+
+Generate the complete SKILL.md file following the plan above.
+
+Key principles:
+1. Be DENSE with useful information - every line should add value
+2. Prioritize actionable guidance over theory
+3. Include ALL the examples marked in the plan
+4. Make warnings/pitfalls prominent
+5. Quick reference sections should be scannable (tables, short bullets)
+6. Use code blocks with proper language tags
+7. No fluff or filler content
+
+Generate the SKILL.md now:
 """
 
     response = client.models.generate_content(
@@ -164,8 +255,19 @@ Generate the complete SKILL.md content:
         contents=prompt,
         config=types.GenerateContentConfig(
             temperature=0.3,
-            max_output_tokens=8192,
+            max_output_tokens=16384,
         )
     )
 
     return response.text
+
+
+# Keep the old function for backwards compatibility, but have it use the new two-step process
+def synthesize_skill(book_title: str, skill_name: str, skill_description: str,
+                     chapter_extracts: list[dict], model: str = "gemini-2.5-pro-preview-05-06") -> str:
+    """
+    Take all chapter extracts and synthesize into a comprehensive SKILL.md.
+    Uses two-step process: plan then generate.
+    """
+    plan = plan_skill(book_title, skill_name, skill_description, chapter_extracts, model)
+    return generate_skill(book_title, skill_name, skill_description, chapter_extracts, plan, model)

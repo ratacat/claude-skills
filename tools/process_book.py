@@ -21,7 +21,8 @@ from gemini import (
     identify_chapters,
     extract_chapter_text,
     process_chapter,
-    synthesize_skill,
+    plan_skill,
+    generate_skill,
 )
 
 
@@ -111,13 +112,36 @@ def main():
             json.dump(chapter_extracts, f, indent=2)
         print(f"Saved intermediates to: {intermediates_path}")
 
-    # Step 4: Synthesize into skill
-    print("Step 4: Synthesizing skill with Gemini Pro...")
-    skill_content = synthesize_skill(
+    # Step 4: Plan the skill structure
+    print("Step 4: Planning skill structure with Gemini Pro...")
+    skill_plan = plan_skill(
         book_title,
         args.skill_name,
         args.description,
         chapter_extracts,
+        model=args.synthesis_model
+    )
+    print(f"  Planned {len(skill_plan.get('sections', []))} sections")
+    print(f"  {len(skill_plan.get('examples_to_include', []))} examples to include")
+    print(f"  {len(skill_plan.get('warnings_and_pitfalls', []))} warnings/pitfalls")
+    print(f"  Estimated length: {skill_plan.get('estimated_length', 'unknown')}")
+
+    # Save the plan
+    if args.save_intermediates:
+        plan_path = output_dir / "skill_plan.json"
+        with open(plan_path, "w") as f:
+            json.dump(skill_plan, f, indent=2)
+        print(f"  Saved plan to: {plan_path}")
+    print()
+
+    # Step 5: Generate the skill from the plan
+    print("Step 5: Generating SKILL.md from plan...")
+    skill_content = generate_skill(
+        book_title,
+        args.skill_name,
+        args.description,
+        chapter_extracts,
+        skill_plan,
         model=args.synthesis_model
     )
 

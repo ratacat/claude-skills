@@ -62,7 +62,8 @@ python tools/process_book.py sources/my-book.pdf \
 1. **Extract** — Pulls text from EPUB, MOBI, or PDF
 2. **Chunk** — Sends to Gemini to identify chapter boundaries
 3. **Process** — Each chapter processed separately (extracts concepts, procedures, best practices, warnings)
-4. **Synthesize** — All chapter extracts aggregated into a comprehensive `SKILL.md`
+4. **Plan** — Reviews all extracts, decides what sections/examples/warnings the skill should have
+5. **Generate** — Creates the final `SKILL.md` following the plan
 
 ## Installing Skills
 
