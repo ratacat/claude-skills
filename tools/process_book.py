@@ -14,6 +14,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from extractors import extract_text
 from gemini import (
@@ -124,34 +125,51 @@ def main():
         print(f"    {i}. {ch['title']}")
     print()
 
-    # Step 4: Process each chapter
-    print("Step 4: Processing chapters...")
-    chapter_extracts = []
+    # Step 4: Process each chapter (in parallel)
+    print(f"Step 4: Processing {len(chapters)} chapters in parallel...")
 
-    for i, chapter in enumerate(chapters, 1):
-        print(f"  [{i}/{len(chapters)}] {chapter['title']}...")
-
+    def process_one_chapter(chapter_info):
+        idx, chapter = chapter_info
         try:
             chapter_text = extract_chapter_text(
                 full_text,
                 chapter["start_pos"],
                 chapter["end_pos"]
             )
-
             extract = process_chapter(
                 chapter["title"],
                 chapter_text,
                 book_title,
                 model=args.model
             )
-            chapter_extracts.append(extract)
-            print(f"    Extracted: {len(extract.get('key_concepts', []))} concepts, "
-                  f"{len(extract.get('procedures', []))} procedures")
-
+            return idx, chapter["title"], extract, None
         except Exception as e:
-            print(f"    Warning: Failed to process - {e}")
-            continue
+            return idx, chapter["title"], None, str(e)
 
+    chapter_extracts = [None] * len(chapters)
+    completed = 0
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {
+            executor.submit(process_one_chapter, (i, ch)): i
+            for i, ch in enumerate(chapters)
+        }
+
+        for future in as_completed(futures):
+            idx, title, extract, error = future.result()
+            completed += 1
+
+            if extract:
+                chapter_extracts[idx] = extract
+                print(f"  [{completed}/{len(chapters)}] {title}: "
+                      f"{len(extract.get('key_concepts', []))} concepts, "
+                      f"{len(extract.get('procedures', []))} procedures")
+            else:
+                print(f"  [{completed}/{len(chapters)}] {title}: Failed - {error}")
+
+    # Filter out None values (failed chapters)
+    chapter_extracts = [e for e in chapter_extracts if e is not None]
+    print(f"  Successfully processed {len(chapter_extracts)} chapters")
     print()
 
     # Save intermediates if requested
