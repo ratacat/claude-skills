@@ -9,5 +9,12 @@ sources/
 *.swo
 *~
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
 # Node (if we add any tooling)
 node_modules/
