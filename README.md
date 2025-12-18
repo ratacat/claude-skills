@@ -17,59 +17,60 @@ claude-skills/
 │       └── SKILL.md
 ├── sources/             # Source books (gitignored - not committed)
 │   └── postgres-16-internals.pdf
-└── tools/               # Processing pipeline
-    ├── process_book.py  # Main entry point
-    ├── extractors.py    # EPUB/MOBI/PDF text extraction
-    ├── gemini.py        # Gemini API for processing
-    └── requirements.txt
+├── src/                 # Source code
+│   ├── cli.js          # Command-line interface
+│   ├── extractors/     # Text extraction (EPUB/MOBI/PDF)
+│   ├── llm/            # LLM client (Gemini)
+│   ├── pipeline/       # Processing pipeline stages
+│   └── design/         # Requirements and design docs
+└── package.json        # Node.js project config
 ```
 
 ## Creating Skills from Books
 
 ### Prerequisites
 
-1. Python 3.10+
+1. Node.js 18+
 2. Google AI API key (Gemini)
-3. Optional: Calibre (for MOBI/AZW support)
 
 ### Setup
 
 ```bash
-cd tools
-pip install -r requirements.txt
+npm install
 export GEMINI_API_KEY="your-api-key"
-
-# Optional: Install Calibre for MOBI support
-brew install calibre
 ```
 
 ### Usage
 
 ```bash
-# Simple - Gemini proposes skill names/descriptions, you pick one
-python tools/process_book.py sources/my-book.pdf
+# Using the make-skill command
+npx make-skill <source> <name> <description>
 
-# Or specify explicitly
-python tools/process_book.py sources/my-book.pdf \
-    --skill-name "topic-expert" \
-    --description "Expert knowledge on topic X. Use when working with X."
+# Example
+npx make-skill sources/my-book.pdf \
+    "topic-expert" \
+    "Expert knowledge on topic X. Use when working with X."
 ```
 
+**Arguments:**
+- `<source>`: Path to book file (EPUB, PDF, MOBI)
+- `<name>`: Skill name (kebab-case)
+- `<description>`: Skill description (what it does + when to use it)
+
 **Options:**
-- `--skill-name`: Skill name (kebab-case). If omitted, Gemini proposes options.
-- `--description`: Skill description. If omitted, Gemini proposes options.
-- `--model`: Gemini model for chapter processing (default: `gemini-2.5-flash`)
-- `--synthesis-model`: Model for final synthesis (default: `gemini-2.5-pro`)
-- `--save-intermediates`: Save chapter extracts and skill plan as JSON
-- `--output-dir`: Where to write skills (default: `skills/`)
+- `--output-dir <dir>`: Where to write skills (default: `skills/`)
+- `--model <model>`: Model for chapter processing (default: `gemini-1.5-flash`)
+- `--synthesis-model <model>`: Model for synthesis (default: `gemini-1.5-pro`)
+- `--concurrency <n>`: Parallel chapter processing (default: `5`)
+- `--no-save-intermediates`: Skip saving intermediate files (saved by default)
 
 ### How It Works
 
 1. **Extract** — Pulls text from EPUB, MOBI, or PDF
 2. **Propose** — (if needed) Gemini proposes 3 skill name/description options, you pick one
-3. **Chunk** — Sends to Gemini to identify chapter boundaries
-4. **Process** — Each chapter processed separately (extracts concepts, procedures, best practices, warnings)
-5. **Plan** — Reviews all extracts, decides what sections/examples/warnings the skill should have
+3. **Identify** — Analyzes structure to identify chapter boundaries
+4. **Process** — Each chapter processed in parallel (extracts concepts, procedures, examples, warnings)
+5. **Plan** — Reviews all extracts, decides sections/examples/emphasis for the skill
 6. **Generate** — Creates the final `SKILL.md` following the plan
 
 ## Installing Skills

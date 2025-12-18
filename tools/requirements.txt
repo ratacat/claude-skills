@@ -1,9 +1,0 @@
-# Core dependencies
-google-genai>=1.0.0
-
-# PDF extraction
-pdfplumber>=0.10.0
-
-# EPUB extraction (fallback if Calibre not installed)
-ebooklib>=0.18
-beautifulsoup4>=4.12.0

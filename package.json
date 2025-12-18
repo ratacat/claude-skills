@@ -1,0 +1,35 @@
+{
+  "name": "claude-skills",
+  "version": "0.1.0",
+  "description": "Tools for creating Claude Code skills from books using progressive LLM processing",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "make-skill": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "dev": "node --watch src/cli.js"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "skills",
+    "llm",
+    "book-processing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@lingo-reader/epub-parser": "*",
+    "pdf-parse": "^1.1.1",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0"
+  }
+}
