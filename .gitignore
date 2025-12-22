@@ -20,3 +20,5 @@ venv/
 
 # Node (if we add any tooling)
 node_modules/
+.tmp
+Docs

@@ -1,30 +1,24 @@
-# Claude Skills Library
+# Claude Skills
 
-A collection of Claude Code skills for various tasks—from downloading ebooks and bypassing paywalls to writing clean code and debugging systematically.
+A curated collection of skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code)—reusable knowledge that Claude automatically applies when relevant.
 
-## What are Claude Code Skills?
-
-Skills are knowledge files that Claude Code automatically discovers and uses based on context. Unlike slash commands (which users invoke explicitly), skills are model-invoked—Claude reads the skill's description and activates it when relevant to your request.
-
-Each skill lives in a folder with a `SKILL.md` file containing structured knowledge, best practices, and procedures.
-
-## Installing Skills
-
-Copy skill folders to one of these locations:
-
-```bash
-# Personal (available in all projects)
-cp -r skills/clean-code ~/.claude/skills/
-
-# Project-specific
-cp -r skills/clean-code .claude/skills/
-```
-
-Claude will automatically discover and use skills when their description matches your request.
+| Skill | Description |
+|-------|-------------|
+| **[annas-archive-ebooks](#annas-archive-ebooks)** | Search and download ebooks from Anna's Archive |
+| **[assembly-ai-streaming](#assembly-ai-streaming)** | Real-time speech-to-text and voice agent development |
+| **[clean-code](#clean-code)** | Write readable, maintainable code (Robert C. Martin) |
+| **[design-patterns](#design-patterns)** | GoF and enterprise architecture patterns |
+| **[documentation-scraper](#documentation-scraper)** | Scrape docs sites into markdown for AI context |
+| **[ebook-extractor](#ebook-extractor)** | Extract text from EPUB, MOBI, and PDF files |
+| **[kalshi-prediction-market](#kalshi-prediction-market)** | Prediction market mechanics and Kalshi API |
+| **[medium-paywall-bypass](#medium-paywall-bypass)** | Read paywalled Medium articles |
+| **[modern-web-app-architecture](#modern-web-app-architecture)** | SPA/SSR/SSG architecture decisions |
+| **[postgres-query-expert](#postgres-query-expert)** | PostgreSQL 16 queries and optimization |
+| **[systematic-debugging](#systematic-debugging)** | Root-cause debugging methodology |
+| **[web-interface-design](#web-interface-design)** | UI design: forms, buttons, layouts, color |
+| **[writing-claude-skills](#writing-claude-skills)** | Create effective Claude Code skills |
 
 ---
-
-## Skills
 
 ### annas-archive-ebooks
 
@@ -86,6 +80,28 @@ Apply Clean Code principles when writing, reviewing, or refactoring code. Covers
 - `chapters/error-handling.md` — Exception patterns
 - `chapters/objects-and-data.md` — Data structures vs objects
 - `chapters/tests.md` — Test design
+
+---
+
+### documentation-scraper
+
+**Scrape documentation sites into markdown for AI context**
+
+Use slurp-ai to download and compile documentation websites into a single markdown file optimized for AI agent consumption.
+
+**Workflow:**
+1. Analyze sitemap first (`node analyze-sitemap.js <url>`)
+2. Review page counts and section structure
+3. Run slurp with informed `--base-path` and `--max` parameters
+
+**Features:**
+- Sitemap analyzer script for pre-scrape reconnaissance
+- Guidance on scoping large documentation sites
+- CLI reference for slurp-ai options
+
+**Requirements:**
+- Node.js v20+
+- `npm install -g slurp-ai`
 
 ---
 
@@ -215,6 +231,51 @@ A disciplined approach to debugging that finds root causes before attempting fix
 
 ---
 
+### modern-web-app-architecture
+
+**Design modern JavaScript/TypeScript web applications**
+
+Comprehensive guidance for SPA/SSR/SSG/ISR/RSC architecture decisions, state management, performance, and team scaling.
+
+**Covers:**
+- Rendering strategy selection (CSR vs SSR vs SSG vs ISR vs RSC)
+- State management patterns (local, global, server state)
+- Component patterns (Container/Presentational, Compound, Hooks)
+- Performance budgets and Core Web Vitals optimization
+- Micro-frontends for large teams
+- Security, accessibility, testing strategies
+
+**Reference Files:**
+- React patterns, SPA fundamentals, micro-frontends
+- Performance, security, accessibility, testing
+- Architecture decisions and trade-offs
+
+---
+
+### web-interface-design
+
+**Design effective web UI (forms, buttons, layouts, colors)**
+
+Apply interface design principles when building or reviewing web UI. Covers typography, forms, buttons, color systems, layouts, and accessibility.
+
+**Key Principles:**
+- Design exists to separate primary from secondary
+- Users should instantly recognize what matters
+- Good interface design is invisible
+
+**Reference Files:**
+- `typography.md` — Font sizes, line spacing, vertical rhythm
+- `forms-and-inputs.md` — Validation, labels, touch targets
+- `buttons.md` — Hierarchy, states, CTAs
+- `color-systems.md` — Palettes, dark mode, tints/shades
+- `layout-and-spacing.md` — Grids, spacing scales, responsive
+- `visual-hierarchy.md` — Focus techniques, action pyramid
+- `accessibility.md` — Contrast, focus states, WCAG
+
+**Sources:** Web Interface Handbook, Refactoring UI, WCAG 2.1
+
+---
+
 ### writing-claude-skills
 
 **Create effective Claude Code skills**
@@ -234,6 +295,41 @@ Test-Driven Development applied to process documentation. Write skills that actu
 - Flowchart and code example conventions
 
 **Key Insight:** If you didn't watch an agent fail without the skill, you don't know if the skill teaches the right thing.
+
+---
+
+## Installation
+
+### Quick Start (Recommended)
+
+```bash
+git clone https://github.com/jaredsmith/claude-skills.git ~/claude-skills
+ln -s ~/claude-skills/skills ~/.claude/skills
+```
+
+Update later with `cd ~/claude-skills && git pull`
+
+### Fork First
+
+If you want to add your own skills:
+
+1. Fork this repo
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/claude-skills.git ~/claude-skills`
+3. Symlink: `ln -s ~/claude-skills/skills ~/.claude/skills`
+
+### Copy Individual Skills
+
+```bash
+cp -r skills/clean-code ~/.claude/skills/
+```
+
+---
+
+## What Are Skills?
+
+Skills are knowledge files that Claude Code automatically discovers and uses based on context. Unlike slash commands (which you invoke explicitly), skills are model-invoked—Claude reads the skill's description and activates it when relevant.
+
+Each skill lives in a folder with a `SKILL.md` file containing structured knowledge, best practices, and procedures.
 
 ---
 
