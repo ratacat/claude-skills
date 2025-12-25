@@ -128,3 +128,42 @@ Typical workflow:
 - **"Invalid md5"** - MD5 hash is malformed or doesn't exist
 - **"Not a member"** - Key is invalid or expired
 - **No results** - Broaden search terms, try author-only search
+
+## Troubleshooting
+
+### SSL Certificate Error on macOS
+
+If you see this error:
+```
+[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate
+```
+
+This happens because Python can't find the system's CA certificate bundle on macOS.
+
+**Quick Fix:**
+
+1. Install certifi:
+   ```bash
+   pip3 install certifi
+   ```
+
+2. Find your certificate path:
+   ```bash
+   python3 -c "import certifi; print(certifi.where())"
+   ```
+
+3. Add to `~/.zshrc`:
+   ```bash
+   export SSL_CERT_FILE=/path/from/step/2/cacert.pem
+   ```
+
+4. Reload shell: `source ~/.zshrc`
+
+**Verify it works:**
+```bash
+python3 -c "import urllib.request; urllib.request.urlopen('https://google.com')"
+```
+
+**Why this happens:** macOS uses Keychain for certificates, but Python doesn't use it by default. Framework installs (like `/Library/Frameworks/Python.framework`) often lack certificate configuration.
+
+**Do NOT** use `verify=False` or `PYTHONHTTPSVERIFY=0` - this disables SSL entirely and is insecure.

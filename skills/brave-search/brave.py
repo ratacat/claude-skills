@@ -73,7 +73,21 @@ def make_request(endpoint, params=None, method="GET", json_body=None):
                 return json.loads(gzip.decompress(response.read()).decode('utf-8'))
             return json.loads(response.read().decode('utf-8'))
     except urllib.error.HTTPError as e:
-        error_body = e.read().decode('utf-8') if e.fp else ""
+        error_body = ""
+        if e.fp:
+            raw = e.read()
+            # Handle gzip-encoded error responses
+            if raw[:2] == b'\x1f\x8b':  # gzip magic bytes
+                import gzip
+                try:
+                    error_body = gzip.decompress(raw).decode('utf-8')
+                except Exception:
+                    error_body = f"[gzip error body, {len(raw)} bytes]"
+            else:
+                try:
+                    error_body = raw.decode('utf-8')
+                except UnicodeDecodeError:
+                    error_body = f"[binary error body, {len(raw)} bytes]"
         print(f"HTTP Error {e.code}: {e.reason}", file=sys.stderr)
         if error_body:
             try:
