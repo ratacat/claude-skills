@@ -16,6 +16,44 @@ import urllib.parse
 from pathlib import Path
 
 
+# Mirror domains in order of preference
+MIRROR_DOMAINS = [
+    "annas-archive.org",
+    "annas-archive.li",
+    "annas-archive.se",
+    "annas-archive.in",
+    "annas-archive.pm",
+]
+
+# Cache for working domain (set after first successful request)
+_working_domain = None
+
+
+def get_base_url():
+    """Get a working base URL, trying mirrors if needed."""
+    global _working_domain
+
+    if _working_domain:
+        return f"https://{_working_domain}"
+
+    # Try each mirror until one works
+    for domain in MIRROR_DOMAINS:
+        url = f"https://{domain}/"
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=10) as response:
+                if response.status == 200:
+                    _working_domain = domain
+                    print(f"Using mirror: {domain}", file=sys.stderr)
+                    return f"https://{domain}"
+        except Exception:
+            continue
+
+    # If none worked, default to .org and let it fail with a proper error
+    print("Warning: Could not connect to any mirror", file=sys.stderr)
+    return "https://annas-archive.org"
+
+
 def get_api_key():
     """Get API key from environment, with helpful error if missing."""
     key = os.environ.get('ANNAS_ARCHIVE_KEY')
@@ -74,7 +112,8 @@ def search_books(query, format_filter=None, sort_by_year=True, limit=10, verify=
     if sort_by_year:
         params['sort'] = 'year_desc'
 
-    url = f"https://annas-archive.org/search?{urllib.parse.urlencode(params)}"
+    base_url = get_base_url()
+    url = f"{base_url}/search?{urllib.parse.urlencode(params)}"
     html = fetch_url(url)
 
     if not html:
@@ -155,7 +194,8 @@ def get_book_details(md5):
     Returns:
         Dictionary with book details
     """
-    url = f"https://annas-archive.org/md5/{md5}"
+    base_url = get_base_url()
+    url = f"{base_url}/md5/{md5}"
     html = fetch_url(url)
 
     if not html:
@@ -215,7 +255,8 @@ def download_book(md5, output_dir=None, path_index=0, domain_index=0):
         'domain_index': domain_index
     }
 
-    api_url = f"https://annas-archive.org/dyn/api/fast_download.json?{urllib.parse.urlencode(params)}"
+    base_url = get_base_url()
+    api_url = f"{base_url}/dyn/api/fast_download.json?{urllib.parse.urlencode(params)}"
 
     response = fetch_url(api_url)
     if not response:

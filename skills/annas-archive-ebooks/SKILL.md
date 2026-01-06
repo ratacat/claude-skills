@@ -123,11 +123,23 @@ Typical workflow:
 1. Download with this skill → `books/Clean_Code.pdf`
 2. Convert with ebook-extractor → `books/Clean_Code.txt`
 
+## Mirror Fallback
+
+The script automatically tries multiple mirror domains if the primary domain is unavailable:
+- annas-archive.org (primary)
+- annas-archive.li
+- annas-archive.se
+- annas-archive.in
+- annas-archive.pm
+
+The first working mirror is cached for the session. You'll see `Using mirror: <domain>` in stderr when a fallback is used.
+
 ## Error Handling
 
 - **"Invalid md5"** - MD5 hash is malformed or doesn't exist
 - **"Not a member"** - Key is invalid or expired
 - **No results** - Broaden search terms, try author-only search
+- **"Could not connect to any mirror"** - All mirrors are down, try again later
 
 ## Troubleshooting
 
