@@ -1,6 +1,6 @@
 ---
 name: brave-search
-description: Use when searching the web via Brave Search API, finding images, news, or getting AI-grounded answers with citations. Triggers on "search brave", "brave search", needing current web info, image searches, news lookups, or requests for cited AI answers.
+description: Use when user asks to search the web, look something up online, find current/recent/latest information, or needs cited answers. Triggers on "search", "look up", "find out about", "what is the current/latest", image searches, news lookups. NOT for searching code/files—only for web/internet searches.
 ---
 
 # Brave Search API
@@ -71,12 +71,12 @@ digraph parallel_search {
 
 | Task | Command |
 |------|---------|
-| Web search | `python3 brave.py web "query"` |
-| Image search | `python3 brave.py images "query"` |
-| News search | `python3 brave.py news "query"` |
-| AI answer | `python3 brave.py ai "question"` |
-| Suggestions | `python3 brave.py suggest "partial query"` |
-| Check key | `python3 brave.py check-key` |
+| Web search | `brave-search web "query"` |
+| Image search | `brave-search images "query"` |
+| News search | `brave-search news "query"` |
+| AI answer | `brave-search ai "question"` |
+| Suggestions | `brave-search suggest "partial query"` |
+| Check key | `brave-search check-key` |
 
 ## API Endpoints
 
@@ -95,49 +95,49 @@ digraph parallel_search {
 ### Web Search
 ```bash
 # Basic search
-python3 brave.py web "python async tutorial" --count 10
+brave-search web "python async tutorial" --count 10
 
 # Filter by freshness (pd=24h, pw=7d, pm=31d, py=365d)
-python3 brave.py web "latest news" --freshness pd
+brave-search web "latest news" --freshness pd
 
 # Filter by country and language
-python3 brave.py web "local restaurants" --country US --lang en
+brave-search web "local restaurants" --country US --lang en
 
 # Safe search (off, moderate, strict)
-python3 brave.py web "query" --safesearch strict
+brave-search web "query" --safesearch strict
 
 # Get extra snippets
-python3 brave.py web "query" --extra-snippets
+brave-search web "query" --extra-snippets
 
 # Filter result types (web, news, videos, images, discussions)
-python3 brave.py web "query" --filter web,news
+brave-search web "query" --filter web,news
 ```
 
 ### Image Search
 ```bash
 # Basic image search
-python3 brave.py images "mountain sunset"
+brave-search images "mountain sunset"
 
 # With safe search
-python3 brave.py images "landscape" --safesearch strict --count 20
+brave-search images "landscape" --safesearch strict --count 20
 ```
 
 ### News Search
 ```bash
 # Recent news
-python3 brave.py news "AI developments" --count 10
+brave-search news "AI developments" --count 10
 
 # News with freshness filter
-python3 brave.py news "election results" --freshness pd
+brave-search news "election results" --freshness pd
 ```
 
 ### AI Grounding (Cited Answers)
 ```bash
 # Get an AI answer with citations
-python3 brave.py ai "What is the tallest building in the world?"
+brave-search ai "What is the tallest building in the world?"
 
 # Enable deep research (multiple searches, slower)
-python3 brave.py ai "Compare React and Vue in 2024" --research
+brave-search ai "Compare React and Vue in 2024" --research
 ```
 
 ## Workflow
