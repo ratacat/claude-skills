@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -h "$SOURCE" ]]; do
+  DIR="$(
+    cd "$(dirname "$SOURCE")" >/dev/null 2>&1
+    pwd
+  )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$(
+  cd "$(dirname "$SOURCE")" >/dev/null 2>&1
+  pwd
+)"
+
+usage() {
+  cat <<'EOF'
+Render Mermaid diagrams as terminal-friendly ASCII/Unicode art using lukilabs/beautiful-mermaid.
+
+Usage:
+  mermaid-ascii [--md] [--block N] [--list] [--cache-dir DIR] [--pkg-dir DIR] [FILE]
+
+Input:
+  - If FILE is provided, read from that file.
+  - Otherwise, read Mermaid text from stdin.
+  - With --md, the input is treated as Markdown and Mermaid is extracted from ```mermaid fenced blocks.
+
+Options:
+  --md                 Parse input as Markdown and extract Mermaid fenced blocks.
+  --block N            Render the Nth Mermaid fenced block (1-based). Default: 1.
+  --list               List Mermaid fenced blocks (prints an index and first line), then exit.
+  --cache-dir DIR      Writable cache dir used for npm cache + package install. Default: $XDG_CACHE_HOME/beautiful-mermaid-ascii (or /tmp/beautiful-mermaid-ascii)
+  --pkg-dir DIR        Directory to resolve node_modules from. Default: <cache-dir>/pkg (auto-installed).
+  -h, --help           Show help.
+
+Examples:
+  mermaid-ascii diagram.mmd
+  cat diagram.mmd | mermaid-ascii
+  mermaid-ascii --md README.md
+  mermaid-ascii --md README.md --block 2
+EOF
+}
+
+mode="raw"
+block="1"
+list="0"
+cache_root="${XDG_CACHE_HOME:-${TMPDIR:-/tmp}}"
+cache_dir="$cache_root/beautiful-mermaid-ascii"
+pkg_dir=""
+
+args=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help) usage; exit 0 ;;
+    --md) mode="md"; shift ;;
+    --block) block="${2:-}"; shift 2 ;;
+    --list) list="1"; shift ;;
+    --cache-dir) cache_dir="${2:-}"; shift 2 ;;
+    --pkg-dir) pkg_dir="${2:-}"; shift 2 ;;
+    --) shift; args+=("$@"); break ;;
+    -*) echo "Unknown option: $1" >&2; usage; exit 2 ;;
+    *) args+=("$1"); shift ;;
+  esac
+done
+
+if [[ -z "$pkg_dir" ]]; then
+  pkg_dir="$cache_dir/pkg"
+fi
+
+mkdir -p "$cache_dir" "$pkg_dir"
+
+# Ensure a stable base for Node resolution via createRequire(). npm doesn't always create this.
+if [[ ! -f "$pkg_dir/package.json" ]]; then
+  cat >"$pkg_dir/package.json" <<'EOF'
+{
+  "private": true
+}
+EOF
+fi
+
+# Install deps into a writable cache dir. This avoids failing in sandboxes that forbid writing to ~.
+need_install="0"
+if [[ ! -f "$pkg_dir/node_modules/beautiful-mermaid/package.json" ]]; then
+  need_install="1"
+fi
+
+if [[ "$need_install" == "1" ]]; then
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "npm not found. Install Node.js (includes npm), or install beautiful-mermaid in your project and rerun with --pkg-dir ." >&2
+    exit 1
+  fi
+
+  npm_cache="$cache_dir/npm-cache"
+  mkdir -p "$npm_cache"
+
+  # Use --no-package-lock to keep the cache dir lightweight and avoid extra writes.
+  NPM_CONFIG_CACHE="$npm_cache" \
+    npm_config_cache="$npm_cache" \
+    npm_config_update_notifier=false \
+    npm_config_fund=false \
+    npm_config_audit=false \
+    npm_config_loglevel=error \
+    npm install --no-package-lock --prefix "$pkg_dir" beautiful-mermaid >/dev/null
+fi
+
+input_file=""
+if [[ ${#args[@]} -ge 1 ]]; then
+  input_file="${args[0]}"
+  if [[ ! -f "$input_file" ]]; then
+    echo "Input file not found: $input_file" >&2
+    exit 1
+  fi
+else
+  input_file="$(mktemp "$cache_dir/mermaid-input.XXXXXX")"
+  cat >"$input_file"
+fi
+
+node "$SCRIPT_DIR/mermaid-ascii.mjs" \
+  --pkg-dir "$pkg_dir" \
+  --mode "$mode" \
+  --block "$block" \
+  --list "$list" \
+  --input "$input_file"

@@ -1,0 +1,10 @@
+{
+  "name": "beautiful-mermaid-ascii-cli",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Render Mermaid diagrams as terminal-friendly ASCII/Unicode art using lukilabs/beautiful-mermaid.",
+  "bin": {
+    "mermaid-ascii": "scripts/mermaid-ascii"
+  }
+}
+
