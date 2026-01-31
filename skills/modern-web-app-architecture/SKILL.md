@@ -1,6 +1,6 @@
 ---
 name: modern-web-app-architecture
-description: Use when designing or building modern web applications in JavaScript/TypeScript (SPA/SSR/SSG/ISR/RSC): architecture trade-offs, state/data patterns, performance, testing, delivery, and team scaling.
+description: "Use when designing or building modern web applications in JavaScript/TypeScript (SPA/SSR/SSG/ISR/RSC): architecture trade-offs, state/data patterns, performance, testing, delivery, and team scaling."
 ---
 
 # Modern Web App Architecture (SPA/SSR/SSG/RSC)
