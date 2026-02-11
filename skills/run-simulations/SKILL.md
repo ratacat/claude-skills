@@ -1,6 +1,6 @@
 ---
 name: run-simulations
-description: "Use BEFORE and AFTER running trading engine simulations. Helps with: (1) SETUP - choosing configs, selecting segments, batch sizing (recommend 2,000-3,000 runs); (2) EXECUTION - running batch simulations with --good-depth flag; (3) ANALYSIS - comprehensive diagnostics after runs. Triggers on: 'run simulations', 'test configs', 'batch simulation', 'analyze sim results', 'which configs to test', 'how many segments', 'simulation setup'."
+description: "Use BEFORE and AFTER running trading engine simulations. Helps with: (1) SETUP - choosing configs, selecting segments via segment collections, batch sizing (recommend 2,000-3,000 runs); (2) EXECUTION - running batch simulations with --collection; (3) ANALYSIS - comprehensive diagnostics after runs. Triggers on: 'run simulations', 'test configs', 'batch simulation', 'analyze sim results', 'which configs to test', 'how many segments', 'simulation setup'."
 ---
 
 # Run Simulations Skill
@@ -29,7 +29,7 @@ Surface interesting profit patterns AND accuracy concerns. Both matter now.
 
 ---
 
-**IMPORTANT**: This skill should be invoked BEFORE running simulations to help with setup decisions (config selection, segment selection, batch sizing).
+**IMPORTANT**: This skill should be invoked BEFORE running simulations to help with setup decisions (config selection, segment selection via collections, batch sizing).
 
 ## Recommended Batch Size
 
@@ -55,13 +55,18 @@ Surface interesting profit patterns AND accuracy concerns. Both matter now.
 ---
 
 ### Default Behavior (no args only)
-Pick a diverse spread of configs and segments:
+Pick a diverse spread of configs and segments using **segment collections** (legacy filters are deprecated):
 1. Query available configs: `SELECT name, config FROM strategy_configs ORDER BY name`
 2. Select 10-20 configs covering different indicator types (EMA, RSI, Bollinger, combined)
-3. Query high-volume segments: `SELECT id, ticker, metrics->>'swing_count' as swings FROM market_segments ORDER BY (metrics->>'swing_count')::int DESC LIMIT 100`
+3. Choose or create a segment collection (AND-only annotations in v1):
+   ```bash
+   bun src/systems/trading-engine/bd-segments.ts list
+   bun src/systems/trading-engine/bd-segments.ts create --name=high-activity --annotations=high_activity --limit=100
+   bun src/systems/trading-engine/bd-segments.ts preview --name=high-activity
+   ```
 4. Run batch simulation:
    ```bash
-   bun src/systems/trading-engine/batch-runner.ts --config-pattern="<pattern>" --good-depth --min-swings=50 --limit=100 --save
+   bun src/systems/trading-engine/batch-runner.ts --config-pattern="<pattern>" --collection=high-activity --save
    ```
 
 ### Batch Runner CLI Reference
@@ -79,40 +84,43 @@ bun src/systems/trading-engine/batch-runner.ts [options]
 | `--config=ID` | `-c` | Strategy config ID (can specify multiple) |
 | `--all-configs` | `-a` | Run all available strategy configs |
 | `--config-pattern=PAT` | `-p` | Run configs matching name pattern (SQL LIKE) |
-| `--segment-ids=IDS` | `-i` | Comma-separated segment IDs (e.g., "949,950,951") |
-| `--min-swings=N` | `-s` | Minimum swings for segments (default: 50) |
-| `--definition-id=ID` | `-d` | Only segments from this definition |
-| `--tag=NAME` | `-t` | Only segments with this tag (can specify multiple) |
+| `--strategy-type=TYPE` | | Filter configs by strategy type (volatility, arb, grid) |
+| `--collection=NAME|ID` | `-C` | Segment collection to run (required) |
+| `--show-selection` | | Preview collection selection and exit |
 | `--capital=CENTS` | | Initial capital in cents (default: 10000 = $100) |
-| `--workers=N` | `-w` | Number of parallel workers (default: 20) |
+| `--workers=N` | `-w` | Number of parallel workers (default: 8) |
 | `--save` | `-S` | Save results to database |
 | `--dry-run` | | Show what would run without executing |
-| `--good-depth` | `-g` | Only segments with valid depth data (source_meta.has_good_depth=true) |
-| `--limit=N` | `-l` | Limit number of segments to process |
+| `--warmup-candles=N` | | Pre-load N candles before segment for indicator warmup (default: 50) |
+| `--db-pool-max=N` | | DB pool size for main batch process (default: 10) |
+| `--db-pool-max-worker=N` | | DB pool size for worker processes (default: 3) |
 
 **Examples:**
 ```bash
-# Run one config on segments with 100+ swings
-bun src/systems/trading-engine/batch-runner.ts --config=abc123 --min-swings=100 --save
+# Run one config on a segment collection
+bun src/systems/trading-engine/bd-segments.ts create --name=swings100 --annotations=high_activity
+bun src/systems/trading-engine/batch-runner.ts --config=abc123 --collection=swings100 --save
 
-# Run all configs on segments with 50+ swings
-bun src/systems/trading-engine/batch-runner.ts --all-configs --min-swings=50 --save
+# Run all configs on a collection
+bun src/systems/trading-engine/batch-runner.ts --all-configs --collection=swings50 --save
 
-# Run all configs on specific segment IDs
-bun src/systems/trading-engine/batch-runner.ts --all-configs --segment-ids=949,950,951,952 --save
+# Run all configs on specific segment IDs (snapshot collection)
+bun src/systems/trading-engine/bd-segments.ts create --name=segment-set --segment-ids=949,950,951,952 --mode=snapshot
+bun src/systems/trading-engine/batch-runner.ts --all-configs --collection=segment-set --save
 
 # Run configs matching "RSI-*" on high_activity segments
-bun src/systems/trading-engine/batch-runner.ts --config-pattern="RSI-%" --tag=high_activity --save
+bun src/systems/trading-engine/bd-segments.ts create --name=rsi-activity --annotations=high_activity
+bun src/systems/trading-engine/batch-runner.ts --config-pattern="RSI-%" --collection=rsi-activity --save
 
 # Dry run to see what would execute
-bun src/systems/trading-engine/batch-runner.ts --all-configs --min-swings=200 --dry-run
+bun src/systems/trading-engine/batch-runner.ts --all-configs --collection=swings100 --dry-run
 ```
 
 ### Key CLI Flags (Quick Reference)
-- `--good-depth` or `-g`: Only use segments with validated depth data (uses `source_meta.has_good_depth` flag)
-- `--min-swings=N` or `-s N`: Minimum swing count for segments (default: 50)
-- `--limit=N` or `-l N`: Max number of segments (default: unlimited)
+- `--collection=NAME|ID` or `-C`: REQUIRED segment collection selector
+- `--show-selection`: Preview resolved segment list and exit
 - `--config-pattern="TEST-%"` or `-p`: Filter configs by name pattern
+- `--strategy-type=grid`: Filter configs by strategy type
 
 ## Phase 2: Comprehensive Analysis (ALWAYS RUN)
 

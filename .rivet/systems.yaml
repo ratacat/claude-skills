@@ -1,0 +1,140 @@
+# .rivet/systems.yaml - Rivet project file
+# Semantic scaffolding for AI-assisted development.
+# This file locks terminology, requirements, and architecture decisions.
+#
+# GENERATION GUIDE FOR AI:
+# When creating or updating this file, follow these principles:
+#
+# 1. CAPTURE USER INTENT - Extract requirements from conversations verbatim
+#    when possible, then tighten language without losing specificity
+#
+# 2. DOMAIN TERMS ONLY - Project and system terms are for domain language
+#    that users/stakeholders use, NOT method names (use TLDR for code structure)
+#
+# 3. BOUNDARIES OVER EXHAUSTIVE LISTS - Define what a system IS and ISN'T
+#    responsible for, rather than listing every function
+#
+# 4. ATOMIC REQUIREMENTS - Each requirement should be testable in isolation
+#    Bad: "Handle user auth and session management"
+#    Good: "Must validate JWT tokens on every request"
+#
+# 5. DECISIONS CAPTURE WHY - Not what the code does, but why it's built that way
+#    Bad: "Uses Redis"
+#    Good: "Redis for session storage - need sub-ms latency for auth checks"
+
+project:
+  name: "claude-skills"        # Project name (e.g., "Acme Backend", "Mobile App")
+  purpose: ""     # One sentence: what problem does this solve?
+
+  # Principles: Development ethos - guiding principles for how this project is built
+  # These shape decisions across all systems. Keep them few and meaningful.
+  #
+  # Examples:
+  #   - "Simplicity over cleverness"
+  #   - "Explicit is better than implicit"
+  #   - "Optimize for readability, not writability"
+  #   - "Fail fast, fail loudly"
+  #
+  principles: []
+
+  # Terms: Project-wide terminology
+  # Format: term: definition
+  #
+  # Terms are typically domain language, but can also be code symbols when
+  # a symbol name carries semantic weight worth locking down.
+  #
+  # SCOPING MATTERS: Choose terms specific enough to avoid collisions with
+  # common words. Prefix with project/system name when needed.
+  #
+  # GOOD terms:
+  #   workspace: "A collection of projects owned by one organization"
+  #   rivet-prompt: "CLI command that outputs AI prompts"  # scoped to avoid collision
+  #   RivetFile: "The parsed contents of systems.yaml"     # code symbol with meaning
+  #
+  # BAD terms:
+  #   prompt: "Output for AI"           # too generic, collides with common usage
+  #   createWorkspace: "Creates a workspace"  # just describes code, no semantic value
+  #
+  terms: {}
+
+  # Deprecated Terms: Old terms that should no longer be used
+  # Format: old-term: { use: new-term, reason: "why it changed" }
+  #
+  # When you rename or replace a term, record it here so future readers
+  # understand the history and use the correct term.
+  #
+  # Example:
+  #   rivet-context:
+  #     use: rivet-prompt
+  #     reason: "Renamed to better reflect that this outputs AI prompts"
+  #
+  deprecated-terms: {}
+
+  # Decisions: Project-wide design rationale - the WHY
+  # These are architectural choices that span multiple systems.
+  #
+  # Examples:
+  #   - "Monorepo structure - shared tooling and atomic commits across packages"
+  #   - "TypeScript everywhere - type safety at API boundaries"
+  #
+  decisions: []
+
+  # Requirements: Project-wide constraints - the WHAT
+  # Non-functional requirements that apply across all systems.
+  #
+  # Examples:
+  #   - "All API responses must complete within 200ms p99"
+  #   - "Must support offline-first operation"
+  #
+  requirements: []
+
+systems:
+  # Each system is a cohesive bundle of code - something you'd draw as a box
+  # in an architecture diagram. Name systems by WHAT they do, not HOW.
+  #
+  # GOOD system names: Router, Auth, Billing, NotificationService
+  # BAD system names: RedisCache, ZodValidator, ExpressMiddleware
+
+  # ExampleSystem:
+  #   description: |
+  #     One or two sentences max. What is this system's responsibility?
+  #     Write from user's perspective, not implementation details.
+  #
+  #   # Requirements: atomic statements of WHAT the system must do
+  #   # These should read like acceptance criteria or test cases
+  #   requirements:
+  #     - "Must authenticate users via OAuth 2.0"
+  #     - "Must rate-limit to 100 requests per minute per user"
+  #     - "Must log all failed authentication attempts"
+  #
+  #   # Decisions: design rationale - the WHY behind implementation choices
+  #   # Remove when superseded (this file reflects current state, not history)
+  #   decisions:
+  #     - "JWT over sessions - need stateless scaling across regions"
+  #     - "bcrypt cost factor 12 - balance security vs response time"
+  #
+  #   # Terms: domain-specific language for THIS system (not method names)
+  #   # Use ~ for self-explanatory terms, string for context
+  #   terms:
+  #     claim: "A key-value pair embedded in a JWT token"
+  #     principal: "The authenticated entity (user or service) making a request"
+  #
+  #   # Boundaries: what's in-scope vs out-of-scope
+  #   # Prevents scope creep and clarifies responsibility
+  #   boundaries:
+  #     - "Authentication only - authorization handled by PermissionService"
+  #     - "Token validation only - token storage handled by Redis"
+  #
+  #   # Relationships: tuples of [type, target_system]
+  #   # Types: calls (runtime), called_by, depends_on (compile-time), used_by
+  #   # Prefer forward relationships (calls, depends_on) over inverse (called_by, used_by)
+  #   relationships:
+  #     - [calls, SessionManager]
+  #     - [depends_on, Schema]
+  #
+  #   # Status: active (default) | deprecated | replacing:OtherSystem
+  #   status: active
+
+# Layout: optional directory structure conventions
+# Can be a string reference to a known layout or inline definition
+layout: ~

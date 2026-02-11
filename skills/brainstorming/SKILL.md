@@ -1,211 +1,190 @@
 ---
 name: brainstorming
-description: Collaborative ideation for projects and writing. Ask clarifying questions, suggest angles, challenge assumptions, and help refine vague ideas into concrete requirements or topics. Use when exploring ideas before planning or drafting.
+description: This skill should be used before implementing features, building components, or making changes. It guides exploring user intent, approaches, and design decisions before planning. Triggers on "let's brainstorm", "help me think through", "what should we build", "explore approaches", ambiguous feature requests, or when the user's request has multiple valid interpretations that need clarification.
 ---
 
 # Brainstorming
 
+This skill provides detailed process knowledge for effective brainstorming sessions that clarify **WHAT** to build before diving into **HOW** to build it.
+
 ## When to Use This Skill
 
-Use brainstorming when:
-- User mentions wanting to build/write something but hasn't structured it yet
-- Initial idea is vague or broad ("I want to build notifications" or "I want to write about productivity")
-- User is exploring multiple angles or approaches
-- Idea needs refinement before planning or outlining
+Brainstorming is valuable when:
+- Requirements are unclear or ambiguous
+- Multiple approaches could solve the problem
+- Trade-offs need to be explored with the user
+- The user hasn't fully articulated what they want
+- The feature scope needs refinement
 
-Skip when:
-- User has clear requirements or outline ready
-- Topic/project is well-defined and just needs execution
-- User explicitly asks to skip ideation and start working
+Brainstorming can be skipped when:
+- Requirements are explicit and detailed
+- The user knows exactly what they want
+- The task is a straightforward bug fix or well-defined change
 
-## Critical: User's Thoughts, Not Yours
+## Core Process
 
-**Your role: Draw out the user's ideas through questions. Never inject your own ideas.**
+### Phase 0: Assess Requirement Clarity
 
-**ASK questions to explore their thoughts:**
-- "What triggered this topic?"
-- "What's your core argument or insight?"
-- "What examples from your experience illustrate this?"
-- "Who is this for?"
+Before diving into questions, assess whether brainstorming is needed.
 
-**DON'T suggest ideas they haven't mentioned:**
-```
-❌ BAD (injecting):
-AI: You should write about microservices vs monoliths
+**Signals that requirements are clear:**
+- User provided specific acceptance criteria
+- User referenced existing patterns to follow
+- User described exact behavior expected
+- Scope is constrained and well-defined
 
-✓ GOOD (exploring):
-AI: What aspect of architecture are you thinking about?
-```
+**Signals that brainstorming is needed:**
+- User used vague terms ("make it better", "add something like")
+- Multiple reasonable interpretations exist
+- Trade-offs haven't been discussed
+- User seems unsure about the approach
 
-**The user is the expert on their own experience. You're just helping them structure it.**
+If requirements are clear, suggest: "Your requirements seem clear. Consider proceeding directly to planning or implementation."
 
-## Core Approach
+### Phase 1: Understand the Idea
 
-**Start with Questions, Not Suggestions**
+Ask questions **one at a time** to understand the user's intent. Avoid overwhelming with multiple questions.
 
-Don't immediately propose outlines or structure. First understand:
-- What triggered this topic? (specific experience, observation, frustration?)
-- Who is the audience?
-- What's the core insight or argument?
-- What makes this topic relevant now?
+**Question Techniques:**
 
-**Examples:**
-- "What triggered this - specific experience or pattern you've noticed?"
-- "Is this for engineers, managers, or general audience?"
-- "What's the contrarian take here? What does conventional wisdom miss?"
-- "Why now? What makes this relevant or timely?"
+1. **Prefer multiple choice when natural options exist**
+   - Good: "Should the notification be: (a) email only, (b) in-app only, or (c) both?"
+   - Avoid: "How should users be notified?"
 
-## Ideation Techniques
+2. **Start broad, then narrow**
+   - First: What is the core purpose?
+   - Then: Who are the users?
+   - Finally: What constraints exist?
 
-### 1. Explore Tensions and Contradictions
-Look for interesting conflicts:
-- "You said X works, but also mentioned Y failed - what's the difference?"
-- "That sounds like it contradicts Z - is that the point?"
+3. **Validate assumptions explicitly**
+   - "I'm assuming users will be logged in. Is that correct?"
 
-### 2. Challenge Assumptions
-Gently probe the premise:
-- "Is that always true, or are there contexts where it breaks down?"
-- "What would someone who disagrees with this say?"
+4. **Ask about success criteria early**
+   - "How will you know this feature is working well?"
 
-### 3. Find the Concrete Angle
-Move from abstract to specific:
-- Vague: "I want to write about AI"
-- Concrete: "Why AI code review misses context that human reviewers catch"
+**Key Topics to Explore:**
 
-**Pattern:**
-- Abstract topic → Specific problem
-- General observation → Concrete example
-- Theory → Practical implication
+| Topic | Example Questions |
+|-------|-------------------|
+| Purpose | What problem does this solve? What's the motivation? |
+| Users | Who uses this? What's their context? |
+| Constraints | Any technical limitations? Timeline? Dependencies? |
+| Success | How will you measure success? What's the happy path? |
+| Edge Cases | What shouldn't happen? Any error states to consider? |
+| Existing Patterns | Are there similar features in the codebase to follow? |
 
-### 4. Suggest Multiple Perspectives
-Offer 2-3 different angles, not just one:
-- "You could approach this as: (1) why X fails, (2) what to do instead, or (3) when X actually works"
-- "This could be prescriptive (here's how to fix it) or descriptive (here's why it happens)"
+**Exit Condition:** Continue until the idea is clear OR user says "proceed" or "let's move on"
 
-### 5. Use Personal Experience as Foundation
-Ground abstract concepts:
-- "You mentioned seeing this at 3 companies - what pattern did you notice?"
-- "Walk me through a specific example where this happened"
+### Phase 2: Explore Approaches
 
-## Working with Outputs
+After understanding the idea, propose 2-3 concrete approaches.
 
-### For Writing (via /new-post):
-Add ideas to **braindump.md**:
+**Structure for Each Approach:**
 
-**Structured sections:**
-- **Context**: What triggered this topic
-- **Core Argument**: Main thesis or insight
-- **Audience**: Who this is for
-- **Angles**: Different approaches to explore
-- **Examples**: Concrete instances, anecdotes
-- **Questions**: Open questions to resolve
+```markdown
+### Approach A: [Name]
 
-**Iterate through conversation** - update braindump.md as ideas evolve.
+[2-3 sentence description]
 
-### For Projects (via /orchestrate --discover):
-Create **discovery.md** with:
+**Pros:**
+- [Benefit 1]
+- [Benefit 2]
 
-**Structured sections:**
-- **Context**: What triggered this project idea
-- **Problem Statement**: What needs solving
-- **Constraints**: Technical, time, resource constraints
-- **Approaches**: Different technical approaches to consider
-- **Research Findings**: Links, docs, patterns discovered
-- **Open Questions**: Unclear requirements or unknowns
+**Cons:**
+- [Drawback 1]
+- [Drawback 2]
 
-## Transition Guidance
-
-Know when to move from brainstorming to execution:
-
-### For Technical Projects
-
-**Ready to plan when:**
-- Problem statement is clear and specific
-- Key constraints identified (performance, scale, security)
-- 2-3 potential approaches explored
-- User expresses readiness or no major unknowns remain
-
-**Transition:**
-```
-AI: We've clarified:
-    - Problem: Real-time notifications for 10k+ concurrent users
-    - Constraints: Must integrate with existing auth, <100ms latency
-    - Approach: WebSocket with Redis pub/sub
-    - Open questions: Documented in discovery.md
-
-    Ready to create implementation plan?
-    → Recommend: /plan-feature [clarified request]
-    → Next agent: planning-agent (uses technical-planning skill)
+**Best when:** [Circumstances where this approach shines]
 ```
 
-**Not ready when:**
-- Problem statement is vague ("something with notifications")
-- Critical constraints unknown (scale, security requirements)
-- Multiple competing approaches without clarity
+**Guidelines:**
+- Lead with a recommendation and explain why
+- Be honest about trade-offs
+- Consider YAGNI—simpler is usually better
+- Reference codebase patterns when relevant
 
-### For Writing
+### Phase 3: Capture the Design
 
-**Ready to outline when:**
-- Core argument is clear
-- Audience is defined
-- 2-3 concrete examples identified
-- User expresses readiness ("okay, let's outline this")
+Summarize key decisions in a structured format.
 
-**Transition:**
+**Design Doc Structure:**
+
+```markdown
+---
+date: YYYY-MM-DD
+topic: <kebab-case-topic>
+---
+
+# <Topic Title>
+
+## What We're Building
+[Concise description—1-2 paragraphs max]
+
+## Why This Approach
+[Brief explanation of approaches considered and why this one was chosen]
+
+## Key Decisions
+- [Decision 1]: [Rationale]
+- [Decision 2]: [Rationale]
+
+## Open Questions
+- [Any unresolved questions for the planning phase]
+
+## Next Steps
+→ `/workflows:plan` for implementation details
 ```
-AI: We've got:
-    - Core argument: OKRs fail because they measure what's easy, not what matters
-    - 3 examples from your experience
-    - Target audience: engineering managers
 
-    Ready to structure this into an outline?
-    → Continue in braindump.md with outline
-    → Next: Draft in draft.md using blog-writing skill
-```
+**Output Location:** `docs/brainstorms/YYYY-MM-DD-<topic>-brainstorm.md`
 
-**Not ready when:**
-- Core argument is still fuzzy
-- Multiple competing angles without clarity on which to pursue
-- Missing concrete examples or evidence
+### Phase 4: Handoff
 
-## Common Pitfalls to Avoid
+Present clear options for what to do next:
 
-1. **Injecting Your Ideas**: Don't suggest topics or angles the user hasn't mentioned - ask questions to draw out THEIR ideas
-2. **Premature Structuring**: Don't jump to outline before the idea is clear
-3. **Too Many Options**: Don't overwhelm with 10 different angles - offer 2-3
-4. **Leading the Witness**: Ask genuine questions, don't push your preferred angle
-5. **Over-Abstracting**: Keep pulling back to concrete examples
-6. **Ignoring Constraints**: If user says "short post," don't brainstorm epic series
-7. **Making Up Examples**: Don't invent scenarios - use only what the user has shared
+1. **Proceed to planning** → Run `/workflows:plan`
+2. **Refine further** → Continue exploring the design
+3. **Done for now** → User will return later
 
-## Quality Checklist
+## YAGNI Principles
 
-**Before transitioning (Writing):**
-- [ ] Core argument is clear and specific (not vague)
-- [ ] At least 2-3 concrete examples or data points identified
-- [ ] Audience and purpose are defined
-- [ ] User feels ready to move forward
-- [ ] Braindump.md has been updated with key ideas
+During brainstorming, actively resist complexity:
 
-**Before transitioning (Projects):**
-- [ ] Problem statement is clear and specific (not vague)
-- [ ] Key constraints identified (scale, performance, security, integrations)
-- [ ] At least 2-3 potential approaches explored
-- [ ] User feels ready to move forward or major unknowns documented
-- [ ] Discovery.md has been created with findings and open questions
+- **Don't design for hypothetical future requirements**
+- **Choose the simplest approach that solves the stated problem**
+- **Prefer boring, proven patterns over clever solutions**
+- **Ask "Do we really need this?" when complexity emerges**
+- **Defer decisions that don't need to be made now**
 
-## Example Flow
+## Incremental Validation
 
-For detailed conversation examples showing brainstorming techniques in action, see reference/examples.md.
+Keep sections short—200-300 words maximum. After each section of output, pause to validate understanding:
 
-## Integration with Other Skills
+- "Does this match what you had in mind?"
+- "Any adjustments before we continue?"
+- "Is this the direction you want to go?"
 
-**For Writing:**
-- **After brainstorming**: Transition to **blog-writing** skill (writing plugin) for drafting
-- **During brainstorming**: Use **research-synthesis** skill if research is needed
-- **Throughout**: Update braindump.md with evolving ideas
+This prevents wasted effort on misaligned designs.
 
-**For Projects:**
-- **After brainstorming**: Transition to **technical-planning** skill via planning-agent
-- **During brainstorming**: Use **research-synthesis** skill to investigate approaches, docs, patterns
-- **Throughout**: Update discovery.md with findings and clarifications
+## Anti-Patterns to Avoid
+
+| Anti-Pattern | Better Approach |
+|--------------|-----------------|
+| Asking 5 questions at once | Ask one at a time |
+| Jumping to implementation details | Stay focused on WHAT, not HOW |
+| Proposing overly complex solutions | Start simple, add complexity only if needed |
+| Ignoring existing codebase patterns | Research what exists first |
+| Making assumptions without validating | State assumptions explicitly and confirm |
+| Creating lengthy design documents | Keep it concise—details go in the plan |
+
+## Integration with Planning
+
+Brainstorming answers **WHAT** to build:
+- Requirements and acceptance criteria
+- Chosen approach and rationale
+- Key decisions and trade-offs
+
+Planning answers **HOW** to build it:
+- Implementation steps and file changes
+- Technical details and code patterns
+- Testing strategy and verification
+
+When brainstorm output exists, `/workflows:plan` should detect it and use it as input, skipping its own idea refinement phase.

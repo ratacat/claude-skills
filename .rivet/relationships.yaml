@@ -1,0 +1,26 @@
+# .rivet/relationships.yaml - System relationships
+# Defines how systems interact with each other
+#
+# Format: [FromSystem, relationship-type, ToSystem]
+#
+# DISCOVERY: If TLDR is available, run `tldr calls .` to discover
+# call relationships automatically, then translate them here.
+
+# Predefined relationship types (add your own as needed)
+types:
+  calls: "Runtime invocation - A calls functions in B"
+  delegates-to: "Passes responsibility - A hands off work to B"
+  depends-on: "Compile-time dependency - A needs B to exist"
+  uses: "General usage - A uses B's functionality"
+  wraps: "Wrapper pattern - A wraps B's interface"
+  validates-with: "Validation - A validates using B"
+  extends: "Extension - A extends B's behavior"
+  implements: "Implementation - A implements B's interface"
+
+# System relationships
+# Example:
+#   - [CLI, delegates-to, Parser]
+#   - [CLI, routes-to, SystemManager]
+#   - [Parser, uses, Schema]
+#
+relationships: []
