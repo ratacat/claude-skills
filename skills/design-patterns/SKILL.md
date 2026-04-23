@@ -1,29 +1,20 @@
 ---
 name: design-patterns
-description: Use when designing software architecture, refactoring code structure, solving recurring design problems, or when code exhibits symptoms like tight coupling, rigid hierarchies, scattered responsibilities, or difficult-to-test components. Also use when choosing between architectural approaches or reviewing code for structural improvements.
+description: "Recommends and applies software design patterns (Factory, Strategy, Observer, Decorator, Repository, and more) to solve structural code problems. Use when designing architecture, refactoring structure, or when code exhibits tight coupling, rigid hierarchies, scattered responsibilities, or is difficult to test."
 ---
 
 # Design Patterns
 
 ## Overview
 
-Design patterns are proven solutions to recurring software design problems. They provide a shared vocabulary for discussing design and capture collective wisdom refined through decades of real-world use.
+Patterns are templates you adapt to your context, not blueprints to copy. Use the right pattern when it genuinely simplifies your design—not to impress or over-engineer. Apply standard SOLID principles; the patterns below embody them.
 
-**Core Philosophy:** Patterns are templates you adapt to your context, not blueprints to copy. Use the right pattern when it genuinely simplifies your design—not to impress or over-engineer.
+## Pattern Application Workflow
 
-## Foundational Principles
-
-These principles underpin all good design:
-
-| Principle | Meaning | Violation Symptom |
-|-----------|---------|-------------------|
-| **Encapsulate What Varies** | Isolate changing parts from stable parts | Changes ripple through codebase |
-| **Program to Interfaces** | Depend on abstractions, not concretions | Can't swap implementations |
-| **Composition Over Inheritance** | Build behavior by composing objects | Deep rigid class hierarchies |
-| **Loose Coupling** | Minimize interdependency between objects | Can't change one thing without breaking another |
-| **Open-Closed** | Open for extension, closed for modification | Must edit existing code for new features |
-| **Single Responsibility** | One reason to change per class | Classes doing too many things |
-| **Dependency Inversion** | High-level modules don't depend on low-level | Business logic coupled to infrastructure |
+1. **Identify symptom** — Use the "By Symptom" table below to match code smells to candidate patterns.
+2. **Select pattern** — Use the "By Problem Type" tree to narrow to the best fit. Consider simpler alternatives first.
+3. **Implement minimally** — Apply the pattern to the specific problem. See the linked reference file for details.
+4. **Verify** — Confirm the symptom is resolved and the added complexity is justified. If the pattern feels forced, reconsider.
 
 ## Pattern Selection Guide
 

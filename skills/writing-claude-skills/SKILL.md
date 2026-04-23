@@ -1,7 +1,6 @@
 ---
 name: writing-skills
-description: Use when user asks to create, write, edit, or test a skill. Also use when documenting reusable techniques, patterns, or workflows for future Claude      
-  instances.   
+description: "Generates SKILL.md files with YAML frontmatter, validates skill format, and applies Claude Search Optimization (CSO) for discoverability. Use when creating, writing, editing, or testing a skill, or when documenting reusable techniques as skill files."
 ---
 
 # Writing Skills
@@ -28,27 +27,6 @@ A **skill** is a reference guide for proven techniques, patterns, or tools. Skil
 
 **Skills are NOT:** Narratives about how you solved a problem once
 
-## Skills vs Other Claude Features
-
-Understanding when to use each feature:
-
-| Feature | Purpose | When to Use |
-|---------|---------|-------------|
-| **Custom Instructions** | Your personality | Global settings across all conversations: "Always use active voice", communication style, general preferences |
-| **Projects** | Your reference library | Static context loaded at start of every chat in that Project. Always in context, never released. Background docs, company context, technical specs |
-| **Skills** | Your specialist team | Load on-demand when needed, then release. Can include executable code. Task-specific workflows, specialized procedures |
-| **MCP** | Your external connections | Standardized protocol to connect Claude to tools and data sources (database access, API connections, tool integrations) |
-
-**How they work together:**
-
-Example workflow:
-1. **Custom Instructions** set your writing style
-2. **Project** contains company background and brand guidelines
-3. **MCP server** gives Claude access to your CRM data
-4. **Skill** defines the workflow: "When generating quarterly reports, fetch CRM data via MCP, analyze trends, apply brand guidelines from Project, and format in my preferred style"
-
-**The key distinction:** MCP handles connections, Skills handle workflows.
-
 ## The Three-Layer Architecture
 
 Skills load information in stages. Understanding this changes how you structure them:
@@ -72,23 +50,6 @@ Skills load information in stages. Understanding this changes how you structure 
 - **Put deterministic operations and code here**
 
 **Why this matters:** Don't write massive Level 2 instructions with code snippets. Write compact Level 2 instructions that say "run analyze.py" and put the actual code in Level 3. Claude executes the script and only sees the output. Way more efficient.
-
-## TDD Mapping for Skills
-
-| TDD Concept | Skill Creation |
-|-------------|----------------|
-| **Test case** | Pressure scenario with subagent |
-| **Production code** | Skill document (SKILL.md) |
-| **Test fails (RED)** | Agent violates rule without skill (baseline) |
-| **Test passes (GREEN)** | Agent complies with skill present |
-| **Refactor** | Close loopholes while maintaining compliance |
-| **Write test first** | Run baseline scenario BEFORE writing skill |
-| **Watch it fail** | Document exact rationalizations agent uses |
-| **Minimal code** | Write skill addressing those specific violations |
-| **Watch it pass** | Verify agent now complies |
-| **Refactor cycle** | Find new rationalizations → plug → re-verify |
-
-The entire skill creation process follows RED-GREEN-REFACTOR.
 
 ## When to Create a Skill
 
@@ -505,95 +466,6 @@ Different skill types need different test approaches:
 - Gap testing: Are common use cases covered?
 
 **Success criteria:** Agent finds and correctly applies reference information
-
-## Common Rationalizations for Skipping Testing
-
-| Excuse | Reality |
-|--------|---------|
-| "Skill is obviously clear" | Clear to you ≠ clear to other agents. Test it. |
-| "It's just a reference" | References can have gaps, unclear sections. Test retrieval. |
-| "Testing is overkill" | Untested skills have issues. Always. 15 min testing saves hours. |
-| "I'll test if problems emerge" | Problems = agents can't use skill. Test BEFORE deploying. |
-| "Too tedious to test" | Testing is less tedious than debugging bad skill in production. |
-| "I'm confident it's good" | Overconfidence guarantees issues. Test anyway. |
-| "Academic review is enough" | Reading ≠ using. Test application scenarios. |
-| "No time to test" | Deploying untested skill wastes more time fixing it later. |
-
-**All of these mean: Test before deploying. No exceptions.**
-
-## Bulletproofing Skills Against Rationalization
-
-Skills that enforce discipline (like TDD) need to resist rationalization. Agents are smart and will find loopholes when under pressure.
-
-**Psychology note:** Understanding WHY persuasion techniques work helps you apply them systematically. See persuasion-principles.md for research foundation (Cialdini, 2021; Meincke et al., 2025) on authority, commitment, scarcity, social proof, and unity principles.
-
-### Close Every Loophole Explicitly
-
-Don't just state the rule - forbid specific workarounds:
-
-<Bad>
-```markdown
-Write code before test? Delete it.
-```
-</Bad>
-
-<Good>
-```markdown
-Write code before test? Delete it. Start over.
-
-**No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-```
-</Good>
-
-### Address "Spirit vs Letter" Arguments
-
-Add foundational principle early:
-
-```markdown
-**Violating the letter of the rules is violating the spirit of the rules.**
-```
-
-This cuts off entire class of "I'm following the spirit" rationalizations.
-
-### Build Rationalization Table
-
-Capture rationalizations from baseline testing (see Testing section below). Every excuse agents make goes in the table:
-
-```markdown
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests passing immediately prove nothing. |
-| "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
-```
-
-### Create Red Flags List
-
-Make it easy for agents to self-check when rationalizing:
-
-```markdown
-## Red Flags - STOP and Start Over
-
-- Code before test
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "This is different because..."
-
-**All of these mean: Delete code. Start over with TDD.**
-```
-
-### Update CSO for Violation Symptoms
-
-Add to description: symptoms of when you're ABOUT to violate the rule:
-
-```yaml
-description: use when implementing any feature or bugfix, before writing implementation code
-```
 
 ## RED-GREEN-REFACTOR for Skills
 
