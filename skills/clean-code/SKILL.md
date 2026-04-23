@@ -1,6 +1,6 @@
 ---
 name: clean-code
-description: Use when writing, reviewing, or refactoring code. Apply when naming variables or functions, structuring classes, handling errors, writing tests, or when code feels complex or hard to understand. Based on Robert C. Martin's Clean Code.
+description: "Applies Robert C. Martin's Clean Code principles — naming conventions, function sizing, comment hygiene, error handling, and class cohesion. Use when code feels complex, names are unclear, functions are too long, or classes have mixed responsibilities. Also use when reviewing or refactoring for readability and maintainability."
 ---
 
 # Clean Code
@@ -9,11 +9,7 @@ description: Use when writing, reviewing, or refactoring code. Apply when naming
 
 Clean code reads like well-written prose. Every name reveals intent. Every function tells a story. Every class has a single purpose. The goal isn't just working code—it's code that others can understand quickly, modify safely, and extend confidently.
 
-> "Clean code always looks like it was written by someone who cares." — Michael Feathers
-
-> "You know you are working on clean code when each routine turns out to be pretty much what you expected." — Ward Cunningham
-
-**The Boy Scout Rule:** Leave the code cleaner than you found it. Every commit should improve quality, even if just slightly. Small improvements compound.
+**The Boy Scout Rule:** Leave the code cleaner than you found it. Every commit should improve quality, even if just slightly.
 
 ## Chapter References
 
@@ -229,14 +225,13 @@ If you do something one way, do all similar things the same way.
 ### C5: Commented-Out Code
 An abomination. Delete it immediately.
 
-## The Craft
+## Clean Code Review Workflow
 
-> "Writing clean code requires the disciplined use of a myriad little techniques applied through a painstakingly acquired sense of 'cleanliness.' The code-sense is the key."
+Apply these checks in order when reviewing or refactoring:
 
-Clean code isn't written by following rules mechanically. It comes from values that drive disciplines—caring about craft, respecting readers of your code, and taking pride in professional work.
-
-**How do you write clean code?** First drafts are clumsy—long functions, nested loops, arbitrary names, duplication. You refine: break out functions, change names, eliminate duplication, shrink methods. Nobody writes clean code from the start.
-
-Getting software to work and making it clean are different activities. Most of us have limited room in our heads, so we focus on getting code to work first. **The problem is that too many of us think we are done once the program works.** We fail to switch to organization and cleanliness. We move on to the next problem rather than going back and breaking overstuffed classes into decoupled units.
-
-Don't. Go back. Clean it up. Leave it better than you found it.
+1. **Names** — Do all names reveal intent? Rename any that need a comment to explain.
+2. **Functions** — Are any over 20 lines or have 3+ arguments? Extract or simplify.
+3. **Comments** — Delete redundant, journal, or commented-out code. Keep only "why" comments.
+4. **Duplication** — Identical code or repeated switch/if-else? Extract or apply polymorphism.
+5. **Error handling** — Returning null or using error codes? Switch to exceptions and Special Case Pattern.
+6. **Tests** — Do tests cover the changed code? Are they readable and independent?

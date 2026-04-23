@@ -1,6 +1,6 @@
 ---
 name: postgres-query-expert
-description: A comprehensive guide for interacting with PostgreSQL 16 databases. Use this skill for constructing standard and advanced SQL queries, optimizing performance, debugging errors, managing schema objects, and introspecting database structure.
+description: "Writes and optimizes PostgreSQL 16 queries — complex joins, CTEs, window functions, JSONB operations, full-text search, and EXPLAIN plan analysis. Use when working with postgres, psql, writing SQL, diagnosing slow queries, creating indexes, managing schemas, or introspecting database structure."
 allowed-tools: Read, Grep, Glob
 ---
 # PostgreSQL Query Expert
@@ -27,6 +27,13 @@ This skill is a definitive reference for PostgreSQL 16, covering query construct
   - **GIN**: For composite types like `JSONB` (`@>`) or arrays (`&&`), and full-text search.
   - **GiST**: For geometric data and ranges.
 - **CTEs**: Use Common Table Expressions (`WITH`) for readability. In PG16+, these are optimized (inlined) by default unless `MATERIALIZED` is specified.
+
+### Performance Diagnosis Workflow
+
+1. **Identify** — Run `EXPLAIN (ANALYZE, BUFFERS)` on the slow query.
+2. **Diagnose** — Look for Seq Scans on large tables, high buffer reads, nested loops on unindexed joins.
+3. **Fix** — Add targeted indexes, rewrite subqueries as joins/CTEs, or add `WHERE` clauses to reduce scan scope.
+4. **Verify** — Re-run `EXPLAIN (ANALYZE, BUFFERS)` and confirm improved plan and reduced execution time.
 
 ## Introspection (Agent Capabilities)
 
